@@ -1,0 +1,6 @@
+{
+	"name": "chain-rxn-party",
+	"main": "src/lib/server/party/index.ts",
+	"compatibilityDate": "2024-03-22",
+	"port": 8000
+}
