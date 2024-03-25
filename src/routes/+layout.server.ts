@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 
-export const load = async ({ cookies }) => {
+export const load = async ({ cookies, url }) => {
 	// check if uname cookie exists
 	const uname = cookies.get('uname');
 	const uid = cookies.get('uid');
@@ -13,6 +13,7 @@ export const load = async ({ cookies }) => {
 	}
 	return {
 		uname,
-		uid
+		uid,
+		url: url.pathname,
 	};
 };

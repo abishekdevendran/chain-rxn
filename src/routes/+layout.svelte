@@ -4,6 +4,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 	import { Toaster } from 'svelte-sonner';
+	import { fly } from 'svelte/transition';
 	let { children, data } = $props();
 </script>
 
@@ -15,6 +16,14 @@
 <Toaster />
 <ProgressBar class="text-primary" />
 <NavBar uname={data.uname} />
-<div class="container max-w-screen-lg items-center flex flex-col py-12">
-	{@render children()}
-</div>
+{#key data.url}
+	<main
+		in:fly={{ x: -200, duration: 300, delay: 300 }}
+		out:fly={{ x: 200, duration: 300 }}
+		class="min-w-full min-h-svh"
+	>
+		<div class="container max-w-screen-lg items-center flex flex-col py-12">
+			{@render children()}
+		</div>
+	</main>
+{/key}
