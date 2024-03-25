@@ -14,16 +14,16 @@
 	<p>Welcome back, {data.uname}!</p>
 	<div class="flex items-center flex-col justify-center gap-2">
 		<h2>Create (or) Join by ID:</h2>
-		<form
-			use:enhance={({formData}) => {
-        const id = formData.get('id') as string;
-        isGoingToJoin = true;
-				goto(`/${id}`);
-			}}
-			action="?/join"
-			method="post"
-		>
-			<div class="grid grid-cols-4 items-center gap-4">
+		<div class="grid grid-cols-4 items-center gap-4">
+			<form
+				use:enhance={({formData}) => {
+				const id = formData.get('id') as string;
+				isGoingToJoin = true;
+						goto(`/${id}`);
+					}}
+				action="?/join"
+				method="post"
+			>
 				<input
 					type="text"
 					name="id"
@@ -40,8 +40,8 @@
 						Join!
 					{/if}
 				</Button>
-			</div>
-		</form>
+			</form>
+		</div>
 		(or)
 		<h2>Join any of the ones listed below:</h2>
 	</div>
