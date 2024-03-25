@@ -12,6 +12,7 @@ export const load = async ({ cookies }) => {
 		});
 	}
 	return {
-		uname
+		uname,
+		uid
 	};
 };

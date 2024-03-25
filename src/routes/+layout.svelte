@@ -3,6 +3,7 @@
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { ModeWatcher } from 'mode-watcher';
 	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
+	import { Toaster } from 'svelte-sonner';
 	let { children, data } = $props();
 </script>
 
@@ -11,6 +12,7 @@
 </svelte:head>
 
 <ModeWatcher />
+<Toaster />
 <ProgressBar class="text-primary" />
 <NavBar uname={data.uname} />
 <div class="container max-w-screen-lg items-center flex flex-col py-12">

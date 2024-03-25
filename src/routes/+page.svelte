@@ -14,34 +14,33 @@
 	<p>Welcome back, {data.uname}!</p>
 	<div class="flex items-center flex-col justify-center gap-2">
 		<h2>Create (or) Join by ID:</h2>
-		<div class="grid grid-cols-4 items-center gap-4">
-			<form
-				use:enhance={({formData}) => {
+		<form
+			use:enhance={({formData}) => {
 				const id = formData.get('id') as string;
 				isGoingToJoin = true;
 						goto(`/${id}`);
 					}}
-				action="?/join"
-				method="post"
-			>
-				<input
-					type="text"
-					name="id"
-					placeholder="Enter ID"
-					class="col-span-3 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-					required
-					minlength={6}
-					maxlength={6}
-				/>
-				<Button type="submit" disabled={isGoingToJoin}>
-					{#if isGoingToJoin}
-						Joining <Loader />
-					{:else}
-						Join!
-					{/if}
-				</Button>
-			</form>
-		</div>
+			action="?/join"
+			method="post"
+			class="grid grid-cols-4 items-center gap-4"
+		>
+			<input
+				type="text"
+				name="id"
+				placeholder="Enter ID"
+				class="col-span-3 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+				required
+				minlength={6}
+				maxlength={6}
+			/>
+			<Button type="submit" disabled={isGoingToJoin}>
+				{#if isGoingToJoin}
+					Joining <Loader />
+				{:else}
+					Join!
+				{/if}
+			</Button>
+		</form>
 		(or)
 		<h2>Join any of the ones listed below:</h2>
 	</div>

@@ -9,7 +9,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"party": "partykit dev --live --verbose"
 	},
 	"devDependencies": {
 		"@prgm/sveltekit-progress-bar": "^2.0.0",
@@ -37,6 +38,7 @@
 		"nanoid": "^5.0.6",
 		"partysocket": "1.0.1",
 		"svelte-radix": "^1.1.0",
+		"svelte-sonner": "^0.3.19",
 		"tailwind-merge": "^2.2.2",
 		"tailwind-variants": "^0.2.1"
 	}
