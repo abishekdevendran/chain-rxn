@@ -1,4 +1,5 @@
 import type * as Party from 'partykit/server';
+import type { TChat, TParticipant, TStartGameMsg } from '$lib/types';
 
 const colors = [
 	"#FF0000",
@@ -37,13 +38,7 @@ export default class Server implements Party.Server {
 	async onClose(conn: Party.Connection) {
 		// A websocket just disconnected!
 		console.log(`Disconnected: ${conn.id}`);
-		let participants = await this.room.storage.get<{
-			connId: string,
-			id: string,
-			name: string,
-			color: string,
-			isReady: boolean
-		}[]>("participants");
+		let participants = await this.room.storage.get<TParticipant[]>("participants");
 		if (participants) {
 			let user = participants.find(p => {
 				console.log(p.connId, conn.id);
@@ -82,11 +77,7 @@ export default class Server implements Party.Server {
 		} = JSON.parse(message);
 		switch (msg.type) {
 			case 'message': {
-				let chat = await this.room.storage.get<{
-					data: string,
-					from: string,
-					fromId: string,
-				}[]>("chat");
+				let chat = await this.room.storage.get<TChat[]>("chat");
 				chat?.push({
 					data: msg.data,
 					from: msg.from,
@@ -100,13 +91,7 @@ export default class Server implements Party.Server {
 			}
 			case 'join': {
 				// check if the user is already in the room
-				let participants = await this.room.storage.get<{
-					connId: string,
-					id: string,
-					name: string,
-					color: string,
-					isReady: boolean
-				}[]>("participants");
+				let participants = await this.room.storage.get<TParticipant[]>("participants");
 				if (participants) {
 					let user = participants.find(p => p.id === msg.fromId);
 					let tempColors = colors[0];
@@ -140,7 +125,7 @@ export default class Server implements Party.Server {
 					// send the user the list of participants
 					sender.send(
 						JSON.stringify({
-							type: 'participants',
+							type: 'statePopulate',
 							participants,
 							chat: await this.room.storage.get<{
 								data: string,
@@ -186,8 +171,9 @@ export default class Server implements Party.Server {
 							await this.room.storage.put("isGameInSession", true);
 							this.room.broadcast(
 								JSON.stringify({
-									type: 'start'
-								})
+									type: 'start',
+									shouldStart: true
+								} as TStartGameMsg)
 							);
 						}
 					}

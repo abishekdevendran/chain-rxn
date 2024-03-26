@@ -6,6 +6,16 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { toast } from 'svelte-sonner';
+	import Lobby from '$lib/components/game/Lobby.svelte';
+	import type {
+		TJoinMsg,
+		TMessageMsg,
+		TStatePopulate,
+		TSysMsg,
+		TLeaveMsg,
+		TReadyMsg,
+		TStartGameMsg
+	} from '$lib/types.js';
 	let dialogOpen = $state(true);
 	let roomPlayers = $state<
 		{
@@ -24,16 +34,6 @@
 	let isGameInSession = $state(false);
 	// connect to our server
 	let partySocket: PartySocket | null = $state(null);
-	let partyMsg = $derived((msg: string, type: 'message' = 'message') =>
-		partySocket?.send(
-			JSON.stringify({
-				type: type,
-				from: data.uname,
-				fromId: data.uid,
-				data: msg
-			})
-		)
-	);
 	$effect(() => {
 		if (data.uname) {
 			console.log('init party socket');
@@ -60,49 +60,13 @@
 			// print each incoming message from the server to console
 			partySocket.addEventListener('message', (e) => {
 				let data:
-					| {
-							type: 'message';
-							from: string;
-							fromId: string;
-							data: string;
-					  }
-					| {
-							type: 'system';
-							data: string;
-					  }
-					| {
-							type: 'join';
-							id: string;
-							name: string;
-							color: string;
-					  }
-					| {
-							type: 'participants';
-							participants: {
-								id: string;
-								name: string;
-								color: string;
-								isReady: boolean;
-							}[];
-							chat: {
-								data: string;
-								from: string;
-								fromId: string;
-							}[];
-							isGameInSession: boolean;
-					  }
-					| {
-							type: 'leave';
-							id: string;
-					  }
-					| {
-							type: 'ready';
-							id: string;
-							isReady: boolean;
-					  }
-					| {
-							type: 'start';
-					  } = JSON.parse(e.data);
+					| TMessageMsg
+					| TSysMsg
+					| TJoinMsg
+					| TStatePopulate
+					| TLeaveMsg
+					| TReadyMsg
+					| TStartGameMsg = JSON.parse(e.data);
 				console.log('Server: ', data);
 				switch (data.type) {
 					case 'message': {
@@ -125,7 +89,7 @@
 						toast('Player joined: ' + data.name);
 						break;
 					}
-					case 'participants': {
+					case 'statePopulate': {
 						roomPlayers = data.participants;
 						msgs = data.chat.map((msg) => ({
 							sender: msg.from,
@@ -158,72 +122,15 @@
 				}
 			});
 		}
+		return () => {
+			console.log('data changed cleanup');
+		};
 	});
 </script>
 
-<h1>Room: {data.roomId}</h1>
 {#if data.uname}
-	Hi, {data.uname}!
-	{#if partySocket}
-		<form
-			on:submit={(e) => {
-				e.preventDefault();
-				console.log("Client: ",(e.target! as any).message.value);
-				partyMsg((e.target! as any).message.value);
-				(e.target! as any).message.value = '';
-			}}
-			class="grid grid-cols-4 items-center gap-4"
-		>
-			<input
-				type="text"
-				name="message"
-				placeholder="Type your message here"
-				class="col-span-3 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-			/>
-			<button type="submit">Send!</button>
-		</form>
-		<div>
-			{#if roomPlayers.length === 0}
-				<p>No players yet</p>
-			{:else}
-				<div class="flex flex-col">
-					{#each roomPlayers as player}
-						<div style={`color: ${player.color}`}>
-							<b>{player.name}</b> :{player.isReady ? 'Ready' : 'Not ready'}
-							{#if player.id === data.uid}
-								<Button
-									disabled={isGameInSession}
-									on:click={() => {
-										player.isReady = !player.isReady;
-										partySocket?.send(
-											JSON.stringify({
-												type: 'ready',
-												fromId: data.uid,
-												isReady: player.isReady
-											})
-										);
-									}}
-								>
-									{player.isReady ? 'Unready' : 'Ready'}
-								</Button>
-							{/if}
-						</div>
-					{/each}
-				</div>
-			{/if}
-			{#if msgs.length === 0}
-				<p>No messages yet</p>
-			{:else}
-				<div class="flex flex-col">
-					{#each msgs as msg}
-						<div>
-							<b>{msg.sender}</b> : {msg.message}
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
-	{/if}
+	<!-- <button on:click={() => (isGameInSession = !isGameInSession)}>Toggle Gamestate</button> -->
+	<Lobby {partySocket} {data} {msgs} {roomPlayers} {isGameInSession} />
 {:else}
 	<AlertDialog.Root bind:open={dialogOpen}>
 		<AlertDialog.Content class="sm:max-w-[425px]">

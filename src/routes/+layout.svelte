@@ -16,14 +16,6 @@
 <Toaster />
 <ProgressBar class="text-primary" />
 <NavBar uname={data.uname} />
-{#key data.url}
-	<main
-		in:fly={{ x: -200, duration: 300, delay: 300 }}
-		out:fly={{ x: 200, duration: 300 }}
-		class="min-w-full min-h-svh"
-	>
-		<div class="container max-w-screen-lg items-center flex flex-col py-12">
-			{@render children()}
-		</div>
-	</main>
-{/key}
+<div class="container max-w-screen-sm items-center flex flex-col py-12">
+	{@render children()}
+</div>
