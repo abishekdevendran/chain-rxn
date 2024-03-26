@@ -4,7 +4,6 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 	import { Toaster } from 'svelte-sonner';
-	import { fly } from 'svelte/transition';
 	let { children, data } = $props();
 </script>
 

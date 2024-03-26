@@ -7,6 +7,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { toast } from 'svelte-sonner';
 	import Lobby from '$lib/components/game/Lobby.svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import type {
 		TJoinMsg,
 		TMessageMsg,
@@ -36,27 +37,22 @@
 	let partySocket: PartySocket | null = $state(null);
 	$effect(() => {
 		if (data.uname) {
-			console.log('init party socket');
+			console.log('init party socket for uname: ', data.uname);
 			partySocket = new PartySocket({
 				host: 'localhost:8000',
 				room: data.roomId
 			});
 		}
 		return () => {
-			console.log('destroy party socket');
+			console.log('effect cleanup 1');
 			partySocket?.close();
 		};
 	});
 	$effect(() => {
-		console.log('data changed', data);
+		// console.log('data changed', data);
+		console.log('Effect');
 		if (partySocket) {
-			partySocket.send(
-				JSON.stringify({
-					type: 'join',
-					fromId: data.uid,
-					from: data.uname
-				})
-			);
+			console.log('Socket exists.');
 			// print each incoming message from the server to console
 			partySocket.addEventListener('message', (e) => {
 				let data:
@@ -121,15 +117,24 @@
 					}
 				}
 			});
+			partySocket.send(
+				JSON.stringify({
+					type: 'join',
+					fromId: data.uid,
+					from: data.uname
+				})
+			);
 		}
-		return () => {
-			console.log('data changed cleanup');
-		};
+	});
+	beforeNavigate(() => {
+		if (partySocket && partySocket.readyState === WebSocket.OPEN) {
+			console.log('Closing socket on Navigating away');
+			partySocket?.close();
+		}
 	});
 </script>
 
 {#if data.uname}
-	<!-- <button on:click={() => (isGameInSession = !isGameInSession)}>Toggle Gamestate</button> -->
 	<Lobby {partySocket} {data} {msgs} {roomPlayers} {isGameInSession} />
 {:else}
 	<AlertDialog.Root bind:open={dialogOpen}>
